@@ -1,74 +1,47 @@
 "use client";
 
-import { useRef, useState } from "react";
+import MuxPlayer from "@mux/mux-player-react";
 
-const RUN_URL = "https://YOUR-CLOUD-RUN-URL/run";
+const PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID ?? "";
 
 export default function Page() {
-  const termRef = useRef<HTMLDivElement>(null);
-  const [status, setStatus] = useState("Idle");
-  const esRef = useRef<EventSource | null>(null);
-
-  const append = (txt: string) => {
-    const el = termRef.current;
-    if (!el) return;
-    el.textContent += txt;
-    el.scrollTop = el.scrollHeight;
-  };
-
-  const run = () => {
-    if (esRef.current) esRef.current.close();
-
-    if (termRef.current) termRef.current.textContent = "";
-    setStatus("Running...");
-
-    const es = new EventSource(RUN_URL);
-    esRef.current = es;
-
-    es.onmessage = (ev) => append(ev.data + "\n");
-    es.onerror = () => {
-      setStatus("Disconnected");
-      es.close();
-      esRef.current = null;
-    };
-  };
-
-  const clear = () => {
-    if (termRef.current) termRef.current.textContent = "";
-  };
+  if (!PLAYBACK_ID) {
+    return (
+      <main style={{ padding: 24, fontFamily: "system-ui" }}>
+        <h1 style={{ margin: 0, fontSize: 18 }}>Configuration required</h1>
+        <p style={{ marginTop: 8 }}>
+          Missing <code>NEXT_PUBLIC_MUX_PLAYBACK_ID</code>. Set it in Vercel →
+          Project → Settings → Environment Variables, then redeploy.
+        </p>
+      </main>
+    );
+  }
 
   return (
-    <>
-      <div style={barStyle}>
-        <button onClick={run}>Run</button>
-        <button onClick={clear}>Clear</button>
-        <span>{status}</span>
-      </div>
-
-      <div ref={termRef} style={termStyle} />
-    </>
+    <main
+      style={{
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        background: "black",
+      }}
+    >
+      <MuxPlayer
+        playbackId={PLAYBACK_ID}
+        // Autoplay reliably on mobile requires muted autoplay.
+        autoPlay="muted"
+        muted
+        playsInline
+        // Show controls so users can unmute / scrub.
+        controls
+        // Set to true if you want the QR page to loop continuously.
+        loop={false}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+        }}
+      />
+    </main>
   );
 }
-
-const barStyle: React.CSSProperties = {
-  padding: 10,
-  background: "#111",
-  color: "#eee",
-  display: "flex",
-  gap: 10,
-  alignItems: "center",
-};
-
-const termStyle: React.CSSProperties = {
-  height: "calc(100vh - 44px)",
-  background: "#000",
-  color: "#0f0",
-  padding: 12,
-  overflow: "auto",
-  whiteSpace: "pre-wrap",
-  wordBreak: "break-word",
-  fontSize: 14,
-  lineHeight: 1.35,
-  fontFamily:
-    'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-};
