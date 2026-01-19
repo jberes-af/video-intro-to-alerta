@@ -1,24 +1,38 @@
 "use client";
 
-import "@mux/mux-player";
+import MuxPlayer from "@mux/mux-player-react";
 
 const PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID ?? "";
 
 export default function Page() {
   if (!PLAYBACK_ID) {
-    return <main style={{ padding: 24 }}>Missing NEXT_PUBLIC_MUX_PLAYBACK_ID</main>;
+    return (
+      <main style={{ padding: 24, fontFamily: "system-ui" }}>
+        Missing <code>NEXT_PUBLIC_MUX_PLAYBACK_ID</code>
+      </main>
+    );
   }
 
   return (
-    <main style={{ width: "100vw", height: "100vh", margin: 0, background: "black" }}>
-      {/* @ts-expect-error - web component attributes */}
-      <mux-player
-        playback-id={PLAYBACK_ID}
-        autoplay="muted"
+    <main
+      style={{
+        width: "100vw",
+        height: "100vh",
+        margin: 0,
+        background: "black",
+      }}
+    >
+      <MuxPlayer
+        playbackId={PLAYBACK_ID}
+        autoPlay="muted"
         muted
-        playsinline
-        controls
-        style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        playsInline
+        loop={false}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+        }}
       />
     </main>
   );
