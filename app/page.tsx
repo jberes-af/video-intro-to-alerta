@@ -5,13 +5,7 @@ import MuxPlayer from "@mux/mux-player-react";
 const PLAYBACK_ID = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID ?? "";
 
 export default function Page() {
-  if (!PLAYBACK_ID) {
-    return (
-      <main style={{ padding: 24, fontFamily: "system-ui" }}>
-        Missing <code>NEXT_PUBLIC_MUX_PLAYBACK_ID</code>
-      </main>
-    );
-  }
+  if (!PLAYBACK_ID) return <main style={{ padding: 24 }}>Missing NEXT_PUBLIC_MUX_PLAYBACK_ID</main>;
 
   return (
     <main
@@ -20,20 +14,30 @@ export default function Page() {
         height: "100vh",
         margin: 0,
         background: "black",
+        display: "grid",
+        placeItems: "center",
+        padding: 12,
+        boxSizing: "border-box",
       }}
     >
-      <MuxPlayer
-        playbackId={PLAYBACK_ID}
-        autoPlay="muted"
-        muted
-        playsInline
-        loop={false}
+      <div
         style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
+          width: "min(100%, 1100px)",
+          aspectRatio: "16 / 9",
+          maxHeight: "100%",
         }}
-      />
+      >
+        <MuxPlayer
+          playbackId={PLAYBACK_ID}
+          autoPlay="muted"
+          muted
+          playsInline
+          style={{
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      </div>
     </main>
   );
 }
